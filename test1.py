@@ -163,10 +163,11 @@ class QuizApp:
     def __init__(self, root):
         self.root = root
         self.root.title("Quest-ion Impossible: Project Management Edition")
-        self.root.geometry("500x400")
+        self.root.geometry("800x400")
         self.score = 0
         self.current_question = 0
         self.user_name = None  # Store user's name
+        self.user_answers = []  # Store user's answers
 
         self.create_welcome_screen()
     
@@ -179,13 +180,13 @@ class QuizApp:
         # Welcome Message
         ttk.Label(
             self.root, 
-            text="Welcome to the Quest-ion Impossible: Project Management Edition!", 
+            text="Welcome to Quest-ion Impossible:\n Project Management Edition!", 
             font=("Courier New", 20, "bold"), 
             justify="center"
         ).pack(pady=20)
 
         # Name Input
-        ttk.Label(self.root, text="Name mo boss ^^:", font=("Courier New", 12, "bold")).pack(pady=10)
+        ttk.Label(self.root, text="Enter you name:", font=("Courier New", 12, "bold")).pack(pady=10)
         self.name_entry = ttk.Entry(self.root, width=30, font=("Courier New", 12))
         self.name_entry.pack(pady=10)
 
@@ -196,10 +197,10 @@ class QuizApp:
             font=("Courier New", 12, "bold")
         )
 
-        # Create the button using the custom style
+        # Start Button
         ttk.Button(
             self.root, 
-            text="Start na boss", 
+            text="Start", 
             style="Custom.TButton", 
             command=self.start_quiz
         ).pack(pady=20)
@@ -220,15 +221,14 @@ class QuizApp:
 
         # Question Label
         self.question_label = ttk.Label(
-            self.root, text="", wraplength=450, font=("Arial", 14), justify="center"
+            self.root, text="", wraplength=450, font=("Arial", 17), justify="center"
         )
         self.question_label.pack(pady=20)
 
         # Answer Buttons
-       # Answer Buttons
         self.answer_buttons = []
         self.button_frame = tk.Frame(self.root)  # Create a frame to hold the buttons
-        self.button_frame.pack(pady=20)  # Pack the frame
+        self.button_frame.pack(pady=15)  # Pack the frame
 
         for i in range(4):  # Assuming 4 choices
             button = ttk.Button(
@@ -237,7 +237,7 @@ class QuizApp:
                 command=lambda i=i: self.check_answer(i)
             )
             # Arrange buttons in a 2x2 grid
-            button.grid(row=i // 2, column=i % 2, padx=10, pady=10, sticky="ew")  # Use sticky to expand width dynamically
+            button.grid(row=i // 2, column=i % 2, padx=20, pady=20, sticky="ew")  # Use sticky to expand width dynamically
             self.answer_buttons.append(button)
 
         # Configure the grid columns to adjust dynamically
@@ -261,6 +261,8 @@ class QuizApp:
     def check_answer(self, index):
         question_data = questions[self.current_question]
         selected_answer = self.answer_buttons[index].cget("text")
+        self.user_answers.append(selected_answer)  # Store the user's answer
+
         if selected_answer == question_data["answer"]:
             self.score += 1
         
@@ -268,11 +270,22 @@ class QuizApp:
         self.load_question()
 
     def show_score(self):
-        """Show the final score and thank the user."""
-        messagebox.showinfo(
-            "Quiz Completed", 
-            f"Thank you, {self.user_name}! Your Score: {self.score}/{len(questions)}"
-        )
+        """Show the final score in percentage and reveal correct answers."""
+        percentage_score = (self.score / len(questions)) * 100
+        result_message = f"Thank you, {self.user_name}!\n\n"
+        result_message += f"Your Score: {self.score}/{len(questions)} ({percentage_score:.2f}%)\n\n"
+        result_message += "Correct Answers:\n"
+        
+        for i, question in enumerate(questions):
+            user_answer = self.user_answers[i]
+            correct_answer = question["answer"]
+            result_message += (
+                f"Q{i+1}: {question['question']}\n"
+                f"Your Answer: {user_answer}\n"
+                f"Correct Answer: {correct_answer}\n\n"
+            )
+
+        messagebox.showinfo("Quiz Completed", result_message)
         self.root.destroy()
 
 # Main Application
