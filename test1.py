@@ -173,6 +173,80 @@ questions = [
         ],
         "answer":  "A document that outlines the project's objectives, deliverables, and boundaries"
     },
+    {
+        "question": "What is project stakeholder",
+        "choices": [
+            "Someone who is impacted by the project",
+            "Project Life Cycle",
+            "Project Subprojects",
+            "Operating of Portfolio"
+        ],
+        "answer": "Project Subprojects"
+    },
+    {
+        "question": "Which of the following factors can definitely make a project fail?",
+        "choices": ["The project team does not have insufficient skills",
+                    "The customer raises a lot of change requests.",
+                    "The project team fails to communicate and\nbuild up working relation with the customer.",
+                    "A key team member is pulled away from the\nproject due to changing priority"],
+        "answer": "The project team fails to communicate and build up working relation with the customer.",
+    },
+    {
+        "question": "Applying Project Management can help you achieve:",
+        "choices": ["Personal and professional success",
+                    "A sense of self worth and pride",
+                    "A better understanding of how things work",
+                    "All of the above"],
+        "answer": "All of the above"
+    },
+    {
+        "question": "What is the primary role of a project manager?",
+        "choices": ["To manage the project budget",
+                    "To manage the project schedule",
+                    "To lead the project team",
+                    "All of the above"],
+        "answer": "To lead the project team"
+    },
+    {
+        "question": "What is the first step in project planning?",
+        "choices": [
+            "Defining the project scope",
+            "Creating a project schedule",
+            "Manage the project budget",
+            "Identifying project risks"
+        ],
+        "answer": "Defining the project scope"
+    },
+    {
+        "question": "What is a project baseline?",
+        "choices": [
+            "A list of project risks",
+            "A schedule of project task",
+            "A snapshot of project performance",
+            "A plan for project completion"
+        ],
+        "answer": "A snapshot of project performance"
+    },
+    {
+        "question": "What is a project charter?",
+        "choices": [
+            "A list of project risks",
+            "A list of project task",
+            "A document that formally authorizs a project",
+            "A plan for project completion"
+        ],
+        "answer": "A document that formally authorizs a project"
+    },
+    {
+        "question": "What is a project scope statement?",
+        "choices": [
+            "A document that outlines the project's objectives,\n deliverables, and boundaries",
+            "A list of project task",
+            "A document that formally authorizs a project",
+            "A plan for project completion"
+        ],
+        "answer":  "A document that outlines the project's objectives, deliverables, and boundaries"
+    },
 ]
 
 # Shuffle the questions array to randomize the order of questions in the quiz
@@ -183,7 +257,7 @@ class QuizApp:
     def __init__(self, root):
         self.root = root
         self.root.title("Quest-ion Impossible: Project Management Edition")
-        self.root.geometry("800x600")
+        self.root.geometry("800x400")
         self.score = 0
         self.current_question = 0
         self.user_name = None  # Store user's name
@@ -196,14 +270,24 @@ class QuizApp:
         for widget in self.root.winfo_children():
             widget.destroy()
 
+        # Define a custom style for the label
+        style = ttk.Style()
+        style.configure(
+            "Welcome.TLabel", 
+            font=("Courier New", 20, "bold"), 
+            foreground="#E75480"  # Set text color to blue
+        )
+
+        # Apply the custom style to the label
         ttk.Label(
             self.root, 
             text="Welcome to Quest-ion Impossible:\nProject Management Edition!", 
-            font=("Courier New", 20, "bold"), 
+            style="Welcome.TLabel",  # Use the custom style
             justify="center"
         ).pack(pady=20)
 
-        ttk.Label(self.root, text="Enter your name:", font=("Courier New", 12, "bold")).pack(pady=10)
+
+        ttk.Label(self.root, text="Enter your name:", font=("Courier New", 13)).pack(pady=10)
         self.name_entry = ttk.Entry(self.root, width=30, font=("Courier New", 12))
         self.name_entry.pack(pady=10)
 
@@ -325,7 +409,7 @@ class QuizApp:
 
             ttk.Label(scrollable_frame, text=f"Q{i+1}: {question['question']}", font=("Arial", 12, "bold"), wraplength=500).pack(anchor="w", pady=5)
             ttk.Label(scrollable_frame, text=f"Your Answer: {user_answer}", font=("Arial", 12), wraplength=500).pack(anchor="w")
-            ttk.Label(scrollable_frame, text=f"Correct Answer: {correct_answer}", font=("Arial", 12), wraplength=500, foreground="green").pack(anchor="w", pady=(0, 10))
+            ttk.Label(scrollable_frame, text=f"Correct Answer: {correct_answer}", font=("Arial", 12), wraplength=500, foreground="#E75480").pack(anchor="w", pady=(0, 10))
 
         ttk.Button(
             self.root,
