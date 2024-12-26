@@ -8,7 +8,7 @@ root.title("TESTINGGG AAAAAAAAA")
 root.geometry("500x400")
 
 # Load the JPEG image
-background_image = Image.open(r"C:\Users\Lenovo\OneDrive\Documents\Rocelyn - LV\comprog\project\pink.jpg")  # Replace with your .jpg file
+background_image = Image.open(r"pink.jpg")  # Replace with your .jpg file
 background_photo = ImageTk.PhotoImage(background_image)
 
 # Create a Canvas to display the background

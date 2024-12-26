@@ -316,7 +316,7 @@ class QuizApp:
             widget.destroy()
 
         self.question_label = ttk.Label(
-            self.root, text="", wraplength=450, font=("Arial", 17), justify="center"
+            self.root, text="", wraplength=450, font=("Courier New", 17), justify="center"
         )
         self.question_label.pack(pady=20)
 
