@@ -58,7 +58,7 @@ questions = [
         "question": "A project manager's primary responsibility is to:",
         "choices": [
             "Complete project tasks on time",
-            "Ensure the project meets its objectives within scope, time, and cost constraints",
+            "Ensure the project meets its objectives within \nscope, time, and cost constraints",
             "Manage the project budget",
             "Communicate with stakeholders"
         ],
@@ -113,8 +113,8 @@ questions = [
         "question": "Which of the following factors can definitely make a project fail?",
         "choices": ["The project team does not have insufficient skills",
                     "The customer raises a lot of change requests.",
-                    "The project team fails to communicate and build up working relation with the customer.",
-                    "A key team member is pulled away from the project due to changing priority"],
+                    "The project team fails to communicate and\nbuild up working relation with the customer.",
+                    "A key team member is pulled away from the\nproject due to changing priority"],
         "answer": "The project team fails to communicate and build up working relation with the customer.",
     },
     {
@@ -153,6 +153,26 @@ questions = [
         ],
         "answer": "A snapshot of project performance"
     },
+    {
+        "question": "What is a project charter?",
+        "choices": [
+            "A list of project risks",
+            "A list of project task",
+            "A document that formally authorizs a project",
+            "A plan for project completion"
+        ],
+        "answer": "A document that formally authorizs a project"
+    },
+    {
+        "question": "What is a project scope statement?",
+        "choices": [
+            "A document that outlines the project's objectives,\n deliverables, and boundaries",
+            "A list of project task",
+            "A document that formally authorizs a project",
+            "A plan for project completion"
+        ],
+        "answer":  "A document that outlines the project's objectives, deliverables, and boundaries"
+    },
 ]
 
 # Shuffle the questions array to randomize the order of questions in the quiz
@@ -163,7 +183,7 @@ class QuizApp:
     def __init__(self, root):
         self.root = root
         self.root.title("Quest-ion Impossible: Project Management Edition")
-        self.root.geometry("800x400")
+        self.root.geometry("800x600")
         self.score = 0
         self.current_question = 0
         self.user_name = None  # Store user's name
@@ -173,31 +193,26 @@ class QuizApp:
     
     def create_welcome_screen(self):
         """Create the welcome screen where the user inputs their name."""
-        # Clear the root window
         for widget in self.root.winfo_children():
             widget.destroy()
 
-        # Welcome Message
         ttk.Label(
             self.root, 
-            text="Welcome to Quest-ion Impossible:\n Project Management Edition!", 
+            text="Welcome to Quest-ion Impossible:\nProject Management Edition!", 
             font=("Courier New", 20, "bold"), 
             justify="center"
         ).pack(pady=20)
 
-        # Name Input
-        ttk.Label(self.root, text="Enter you name:", font=("Courier New", 12, "bold")).pack(pady=10)
+        ttk.Label(self.root, text="Enter your name:", font=("Courier New", 12, "bold")).pack(pady=10)
         self.name_entry = ttk.Entry(self.root, width=30, font=("Courier New", 12))
         self.name_entry.pack(pady=10)
 
-        # Define a custom style for the button
         style = ttk.Style()
         style.configure(
             "Custom.TButton", 
             font=("Courier New", 12, "bold")
         )
 
-        # Start Button
         ttk.Button(
             self.root, 
             text="Start", 
@@ -206,7 +221,6 @@ class QuizApp:
         ).pack(pady=20)
 
     def start_quiz(self):
-        """Start the quiz after capturing the user's name."""
         self.user_name = self.name_entry.get().strip()
         if not self.user_name:
             messagebox.showwarning("Name Required", "Please enter your name to proceed.")
@@ -214,37 +228,30 @@ class QuizApp:
             self.load_question_screen()
     
     def load_question_screen(self):
-        """Load the question screen for the quiz."""
-        # Clear the root window
         for widget in self.root.winfo_children():
             widget.destroy()
 
-        # Question Label
         self.question_label = ttk.Label(
             self.root, text="", wraplength=450, font=("Arial", 17), justify="center"
         )
         self.question_label.pack(pady=20)
 
-        # Answer Buttons
         self.answer_buttons = []
-        self.button_frame = tk.Frame(self.root)  # Create a frame to hold the buttons
-        self.button_frame.pack(pady=15)  # Pack the frame
+        self.button_frame = tk.Frame(self.root)
+        self.button_frame.pack(pady=15)
 
-        for i in range(4):  # Assuming 4 choices
+        for i in range(4):
             button = ttk.Button(
-                self.button_frame,  # Add the buttons to the frame
+                self.button_frame,
                 text="", 
                 command=lambda i=i: self.check_answer(i)
             )
-            # Arrange buttons in a 2x2 grid
-            button.grid(row=i // 2, column=i % 2, padx=20, pady=20, sticky="ew")  # Use sticky to expand width dynamically
+            button.grid(row=i // 2, column=i % 2, padx=20, pady=20, sticky="ew")
             self.answer_buttons.append(button)
 
-        # Configure the grid columns to adjust dynamically
-        for col in range(2):  # Assuming 2 columns
+        for col in range(2):
             self.button_frame.columnconfigure(col, weight=1)
 
-        # Load the first question
         self.load_question()
 
     def load_question(self):
@@ -256,12 +263,12 @@ class QuizApp:
             for i, choice in enumerate(choices):
                 self.answer_buttons[i].config(text=choice)
         else:
-            self.show_score()
+            self.show_results_button()
 
     def check_answer(self, index):
         question_data = questions[self.current_question]
         selected_answer = self.answer_buttons[index].cget("text")
-        self.user_answers.append(selected_answer)  # Store the user's answer
+        self.user_answers.append(selected_answer)
 
         if selected_answer == question_data["answer"]:
             self.score += 1
@@ -269,24 +276,63 @@ class QuizApp:
         self.current_question += 1
         self.load_question()
 
-    def show_score(self):
-        """Show the final score in percentage and reveal correct answers."""
+    def show_results_button(self):
+        self.question_label.config(text="Quiz Finished! Click the button below to see your results.")
+        for button in self.answer_buttons:
+            button.destroy()
+
+        ttk.Button(
+            self.root,
+            text="See Results",
+            style="Custom.TButton",
+            command=self.show_results
+        ).pack(pady=20)
+
+    def show_results(self):
+        for widget in self.root.winfo_children():
+            widget.destroy()
+
         percentage_score = (self.score / len(questions)) * 100
-        result_message = f"Thank you, {self.user_name}!\n\n"
-        result_message += f"Your Score: {self.score}/{len(questions)} ({percentage_score:.2f}%)\n\n"
-        result_message += "Correct Answers:\n"
-        
+        ttk.Label(
+            self.root,
+            text=f"Thank you, {self.user_name}!\n\nYour Score: {self.score}/{len(questions)} ({percentage_score:.2f}%)",
+            font=("Courier New", 14),
+            wraplength=550,
+            justify="center"
+        ).pack(pady=20)
+
+        answer_frame = ttk.Frame(self.root)
+        answer_frame.pack(fill="both", expand=True, padx=10, pady=10)
+
+        canvas = tk.Canvas(answer_frame)
+        scrollbar = ttk.Scrollbar(answer_frame, orient="vertical", command=canvas.yview)
+        scrollable_frame = ttk.Frame(canvas)
+
+        scrollable_frame.bind(
+            "<Configure>",
+            lambda e: canvas.configure(scrollregion=canvas.bbox("all"))
+        )
+
+        canvas.create_window((0, 0), window=scrollable_frame, anchor="nw")
+        canvas.configure(yscrollcommand=scrollbar.set)
+
+        canvas.pack(side="left", fill="both", expand=True)
+        scrollbar.pack(side="right", fill="y")
+
         for i, question in enumerate(questions):
             user_answer = self.user_answers[i]
             correct_answer = question["answer"]
-            result_message += (
-                f"Q{i+1}: {question['question']}\n"
-                f"Your Answer: {user_answer}\n"
-                f"Correct Answer: {correct_answer}\n\n"
-            )
 
-        messagebox.showinfo("Quiz Completed", result_message)
-        self.root.destroy()
+            ttk.Label(scrollable_frame, text=f"Q{i+1}: {question['question']}", font=("Arial", 12, "bold"), wraplength=500).pack(anchor="w", pady=5)
+            ttk.Label(scrollable_frame, text=f"Your Answer: {user_answer}", font=("Arial", 12), wraplength=500).pack(anchor="w")
+            ttk.Label(scrollable_frame, text=f"Correct Answer: {correct_answer}", font=("Arial", 12), wraplength=500, foreground="green").pack(anchor="w", pady=(0, 10))
+
+        ttk.Button(
+            self.root,
+            text="Restart Quiz",
+            style="Custom.TButton",
+            command=self.create_welcome_screen
+        ).pack(pady=20)
 
 # Main Application
 if __name__ == "__main__":
