@@ -268,7 +268,7 @@ class QuizApp:
     def __init__(self, root):
         self.root = root
         self.root.title("Quest-ion Impossible: Project Management Edition")
-        self.root.geometry("800x600")
+        self.root.geometry("800x700")
         self.root.config(background="#FFC0CB")
 
         self.timer_id = None  # Initialize timer_id
@@ -404,9 +404,6 @@ class QuizApp:
 
     def show_results_button(self):
         """Show the results button."""
-        if self.timer_id:
-            self.root.after_cancel(self.timer_id)
-
         self.question_label.config(text="Quiz Finished! Click the button below to see your results.")
         for button in self.answer_buttons:
             button.destroy()
@@ -418,7 +415,7 @@ class QuizApp:
         ).pack(pady=20)
 
     def show_results(self):
-        """Display the final quiz results, quiz recap, and fun facts."""
+        """Display the final quiz results, quiz recap"""
         for widget in self.root.winfo_children():
             widget.destroy()
 
@@ -445,7 +442,7 @@ class QuizApp:
         ttk.Label(
             self.root,
             text=comparison_text,
-            font=("Courier New", 12, "italic"),
+            font=("Courier New", 12, "bold italic"),
             background="#FFC0CB",
             wraplength=550,
             justify="center"
@@ -516,25 +513,6 @@ class QuizApp:
                 wraplength=500,
                 foreground="green" if user_answer == correct_answer else "red"
             ).pack(anchor="w", pady=(0, 10))
-
-        # Randomized Fun Fact
-        fun_facts = [
-            "The Gantt chart, a popular project management tool, was invented by Henry Gantt in the early 1900s and is still widely used today!",
-            "Agile project management was originally created for software development but is now used in many industries.",
-            "The Project Management Institute (PMI) was founded in 1969 and offers certifications like PMP to professionals worldwide.",
-            "Projects fail more often due to poor communication than technical issues. Always prioritize clear communication!",
-            "The Great Wall of China is considered one of the most ambitious project management feats in history!"
-        ]
-
-        random_fact = random.choice(fun_facts)
-        ttk.Label(
-            self.root,
-            text=f"Fun Fact: {random_fact}",
-            font=("Courier New", 12),
-            background="#FFC0CB",
-            wraplength=550,
-            justify="center"
-        ).pack(pady=20)
 
         ttk.Button(
             self.root,
