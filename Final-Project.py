@@ -1,10 +1,11 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
 import random
+import time
 
-# --- Questions and Answers ---
-questions = [     
-    {
+# Questions and Answers
+questions = [
+       {
         "question": "What is the first stage of a typical project life cycle?",
         "choices": ["Planning", "Executing", "Initiating", "Closing"],
         "answer": "Initiating"
@@ -256,41 +257,37 @@ questions = [
             "A plan for project completion"
         ],
         "answer": "A document that outlines the project's objectives, deliverables, and boundaries"
-    },  
+    },
 ]
 
-
 random.shuffle(questions)
-questions = questions[:10]  # Limiting to 10 random questions
+questions = questions[:10]
+
 
 class QuizApp:
     def __init__(self, root):
         self.root = root
         self.root.title("Quest-ion Impossible: Project Management Edition")
         self.root.geometry("800x600")
-        self.reset_quiz()
         self.root.config(background="#FFC0CB")
 
-        # Call reset_quiz to set up initial states
+        self.timer_id = None  # Initialize timer_id
         self.reset_quiz()
 
     def reset_quiz(self):
-        # Reset score and other states
+        """Reset the quiz to its initial state."""
         self.score = 0
         self.current_question = 0
         self.user_name = None
         self.user_answers = []
-        self.questions = random.sample(questions, len(questions))  # Shuffle the questions
-
-        # Start at the welcome screen
+        self.questions = random.sample(questions, len(questions))
         self.create_welcome_screen()
 
     def create_welcome_screen(self):
-        # Clear previous widgets
+        """Create the welcome screen."""
         for widget in self.root.winfo_children():
             widget.destroy()
 
-        # Welcome message
         ttk.Label(
             self.root,
             text="Welcome to Quest-ion Impossible:\nProject Management Edition!",
@@ -299,12 +296,10 @@ class QuizApp:
             justify="center"
         ).pack(pady=20)
 
-        # Name entry
         ttk.Label(self.root, text="Enter your name:", font=("Courier New", 12, "bold"), background="#FFC0CB").pack(pady=10)
         self.name_entry = ttk.Entry(self.root, width=30, font=("Courier New", 12))
         self.name_entry.pack(pady=10)
 
-        # Start button
         ttk.Button(
             self.root,
             text="Start",
@@ -312,36 +307,41 @@ class QuizApp:
         ).pack(pady=20)
 
     def start_quiz(self):
-        # Get user name and validate
+        """Start the quiz if the user's name is valid."""
         self.user_name = self.name_entry.get().strip()
-        if not self.user_name.isalpha():
-            messagebox.showwarning("Invalid Name", "Please enter a valid name.")
-        elif not self.user_name:
-            messagebox.showwarning("Name Required", "Please enter your name to proceed.")
+        if not self.user_name or not self.user_name.isalpha():
+            messagebox.showwarning("Invalid Input", "Please enter a valid name (letters only).")
         else:
             self.load_question_screen()
 
     def load_question_screen(self):
-        # Clear previous widgets
+        """Load the question screen."""
         for widget in self.root.winfo_children():
             widget.destroy()
 
-        # Display current question
+        self.question_progress = ttk.Label(
+            self.root,
+            text="",
+            font=("Courier New", 14, "bold"),
+            background="#FFC0CB",
+            justify="center"
+        )
+        self.question_progress.pack(pady=10)
+
         self.question_label = ttk.Label(
             self.root, text="", wraplength=450, font=("Courier New", 17), background="#FFC0CB", justify="center"
         )
         self.question_label.pack(pady=20)
 
-        # Create buttons for answer choices
-        self.answer_buttons = []
         self.button_frame = tk.Frame(self.root)
         self.button_frame.pack(pady=15)
 
+        self.answer_buttons = []
         for i in range(4):
             button = ttk.Button(
                 self.button_frame,
                 text="",
-                command=lambda i=i: self.check_answer(i)  # Button action
+                command=lambda i=i: self.check_answer(i)
             )
             button.grid(row=i // 2, column=i % 2, padx=20, pady=20, sticky="ew")
             self.answer_buttons.append(button)
@@ -349,24 +349,51 @@ class QuizApp:
         for col in range(2):
             self.button_frame.columnconfigure(col, weight=1)
 
+        self.timer_label = ttk.Label(
+            self.root,
+            text="",
+            font=("Courier New", 12),
+            background="#FFC0CB",
+            justify="center"
+        )
+        self.timer_label.pack(pady=10)
+
         self.load_question()
 
+    def start_timer(self, countdown=15):
+        """Start a countdown timer."""
+        if countdown > 0:
+            self.timer_label.config(text=f"Time Left: {countdown} seconds")
+            self.timer_id = self.root.after(1000, self.start_timer, countdown - 1)
+        else:
+            self.timer_label.config(text="Time's up!")
+            self.root.after_cancel(self.timer_id)
+            self.current_question += 1
+            self.load_question()
+
     def load_question(self):
-        # Load next question or show results if done
+        """Load a question and its choices."""
         if self.current_question < len(self.questions):
+            if self.timer_id:
+                self.root.after_cancel(self.timer_id)
+
             question_data = self.questions[self.current_question]
-            self.question_label.config(text=f"{self.current_question + 1}. {question_data['question']}")
+            self.question_progress.config(
+                text=f"QUESTION {self.current_question + 1} OUT OF {len(self.questions)}"
+            )
+            self.question_label.config(text=question_data["question"])
             choices = question_data["choices"]
             random.shuffle(choices)
             for i, choice in enumerate(choices):
-                self.answer_buttons[i].config(text=f"{chr(65 + i)}. {choice}")
+                self.answer_buttons[i].config(text=choice)
+            self.start_timer()
         else:
-            self.show_results()
+            self.show_results_button()
 
     def check_answer(self, index):
-        # Check if the selected answer is correct
+        """Check the user's answer."""
         question_data = self.questions[self.current_question]
-        selected_answer = self.answer_buttons[index].cget("text")[3:]  # Remove "A. " prefix
+        selected_answer = self.answer_buttons[index].cget("text")
         self.user_answers.append((question_data["question"], selected_answer, question_data["answer"]))
 
         if selected_answer == question_data["answer"]:
@@ -375,33 +402,26 @@ class QuizApp:
         self.current_question += 1
         self.load_question()
 
-    def start_timer(self):
-        self.timer_running = True
-        self.update_timer()
+    def show_results_button(self):
+        """Show the results button."""
+        if self.timer_id:
+            self.root.after_cancel(self.timer_id)
 
-    def update_timer(self):
-        if self.time_left > 0:
-            self.timer_label.config(text=f"Time Left: {self.time_left} seconds")
-            self.time_left -= 1
-            self.timer_id = self.root.after(1000, self.update_timer)
-        else:
-            self.timer_running = False
-            self.handle_time_out()
+        self.question_label.config(text="Quiz Finished! Click the button below to see your results.")
+        for button in self.answer_buttons:
+            button.destroy()
 
-    def handle_time_out(self):
-        # If time runs out, move to the next question
-        self.user_answers.append(
-            (self.questions[self.current_question]["question"], "No Answer", self.questions[self.current_question]["answer"])
-        )
-        self.current_question += 1
-        self.load_question()
+        ttk.Button(
+            self.root,
+            text="See Results",
+            command=self.show_results
+        ).pack(pady=20)
 
     def show_results(self):
-        # Clear the screen and display the results
+        """Display the final quiz results, quiz recap, and fun facts."""
         for widget in self.root.winfo_children():
             widget.destroy()
 
-        # Calculate percentage score
         percentage_score = (self.score / len(self.questions)) * 100
         ttk.Label(
             self.root,
@@ -412,45 +432,116 @@ class QuizApp:
             justify="center"
         ).pack(pady=20)
 
-        # Display fun fact
-        fun_facts = [
-           "The Gantt chart, a popular project management tool, was invented by Henry Gantt in the early 1900s and is still widely used today!",
-            "Agile project management was originally created for software development but is now used in many industries.",
-            "The Project Management Institute (PMI) was founded in 1969 and offers certifications like PMP to professionals worldwide.",
-            "Projects fail more often due to poor communication than technical issues. Always prioritize clear communication!",
-            "The Great Wall of China is considered one of the most ambitious project management feats in history!"
-        ]
+        # Intelligence comparison
+        if self.score == len(self.questions):
+            comparison_text = "Congratulations! You got a perfect score!\nYou're as intelligent as Albert Einstein!"
+        elif self.score >= len(self.questions) * 0.8:
+            comparison_text = "Great job! You're a Project Management expert!"
+        elif self.score >= len(self.questions) * 0.5:
+            comparison_text = "Not bad! You have a solid understanding of Project Management."
+        else:
+            comparison_text = "Keep learning! You're on the right path to mastering Project Management."
+
         ttk.Label(
             self.root,
-            text=f"Fun Fact: {random.choice(fun_facts)}",
-            font=("Times New Roman", 14, "bold italic"),
+            text=comparison_text,
+            font=("Courier New", 12, "italic"),
+            background="#FFC0CB",
+            wraplength=550,
+            justify="center"
+        ).pack(pady=5)
+
+    def show_results(self):
+        for widget in self.root.winfo_children():
+            widget.destroy()
+
+        percentage_score = (self.score / len(self.questions)) * 100
+        ttk.Label(
+            self.root,
+            text=f"Thank you, {self.user_name}!\n\nYour Score: {self.score}/{len(self.questions)} ({percentage_score:.2f}%)",
+            font=("Courier New", 14),
             background="#FFC0CB",
             wraplength=550,
             justify="center"
         ).pack(pady=20)
 
-        for i, question in enumerate(questions):
-            user_answer = self.user_answers[i]
-            correct_answer = question["answer"]
+                # Intelligence comparison based on score
+        if self.score == len(self.questions):
+            comparison_text = "Congratulations! You got a perfect score!\nYou're as intelligent as Albert Einstein!"
+        elif self.score >= len(self.questions) * 0.8:
+            comparison_text = "Great job! You're a Project Management expert!"
+        elif self.score >= len(self.questions) * 0.5:
+            comparison_text = "Not bad! You have a solid understanding of Project Management."
+        else:
+            comparison_text = "Keep learning! You're on the right path to mastering Project Management."
 
-            ttk.Label(scrollable_frame, text=f"Q{i+1}: {question['question']}", font=("Arial", 12, "bold"), wraplength=500).pack(anchor="w", pady=5)
-            ttk.Label(scrollable_frame, text=f"Your Answer: {user_answer}", font=("Arial", 12), wraplength=500).pack(anchor="w")
-            ttk.Label(scrollable_frame, text=f"Correct Answer: {correct_answer}", font=("Arial", 12), wraplength=500, foreground="#E75480").pack(anchor="w", pady=(0, 10))
-
-        ttk.Button(
+        ttk.Label(
             self.root,
-            text="Restart Quiz",
-            style="Custom.TButton",
-            command=self.create_welcome_screen
+            text=comparison_text,
+            font=("Courier New", 12, "italic"),
+            background="#FFC0CB",
+            wraplength=550,
+            justify="center"
         ).pack(pady=20)
 
-        # Restart button
+        # Display detailed results
+        result_frame = tk.Frame(self.root)
+        result_frame.pack(fill="both", expand=True, padx=10, pady=10)
+
+        canvas = tk.Canvas(result_frame)
+        scrollbar = ttk.Scrollbar(result_frame, orient="vertical", command=canvas.yview)
+        scrollable_frame = ttk.Frame(canvas)
+
+        scrollable_frame.bind(
+            "<Configure>",
+            lambda e: canvas.configure(scrollregion=canvas.bbox("all"))
+        )
+
+        canvas.create_window((0, 0), window=scrollable_frame, anchor="nw")
+        canvas.configure(yscrollcommand=scrollbar.set)
+
+        canvas.pack(side="left", fill="both", expand=True)
+        scrollbar.pack(side="right", fill="y")
+
+        for i, (question, user_answer, correct_answer) in enumerate(self.user_answers):
+            ttk.Label(scrollable_frame, text=f"Q{i + 1}: {question}", font=("Arial", 12, "bold"),
+                      background="#FFC0CB", wraplength=500).pack(anchor="w", pady=5)
+            ttk.Label(scrollable_frame, text=f"Your Answer: {user_answer}", font=("Arial", 12), background="pink",
+                      wraplength=500).pack(anchor="w")
+            ttk.Label(
+                scrollable_frame,
+                text=f"Correct Answer: {correct_answer}",
+                font=("Arial", 12),
+                background="#FFC0CB",
+                wraplength=500,
+                foreground="green" if user_answer == correct_answer else "red"
+            ).pack(anchor="w", pady=(0, 10))
+
+        # Randomized Fun Fact
+        fun_facts = [
+            "The Gantt chart, a popular project management tool, was invented by Henry Gantt in the early 1900s and is still widely used today!",
+            "Agile project management was originally created for software development but is now used in many industries.",
+            "The Project Management Institute (PMI) was founded in 1969 and offers certifications like PMP to professionals worldwide.",
+            "Projects fail more often due to poor communication than technical issues. Always prioritize clear communication!",
+            "The Great Wall of China is considered one of the most ambitious project management feats in history!"
+        ]
+
+        random_fact = random.choice(fun_facts)
+        ttk.Label(
+            self.root,
+            text=f"Fun Fact: {random_fact}",
+            font=("Courier New", 12),
+            background="#FFC0CB",
+            wraplength=550,
+            justify="center"
+        ).pack(pady=20)
+
         ttk.Button(
             self.root,
             text="Restart Quiz",
             command=self.reset_quiz
         ).pack(pady=20)
-
+        
 # Main Application
 if __name__ == "__main__":
     root = tk.Tk()

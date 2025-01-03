@@ -1,0 +1,6 @@
+import tkinter
+from tkinter import font
+
+root = tkinter.Tk()
+print(font.families())  # Prints a list of all available font families
+root.destroy()

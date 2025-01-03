@@ -5,14 +5,14 @@ from PIL import Image, ImageTk  # Import from Pillow
 # Create the main application window
 root = tk.Tk()
 root.title("TESTINGGG AAAAAAAAA")
-root.geometry("500x400")
+root.geometry("800x400")
 
 # Load the JPEG image
 background_image = Image.open(r"pink.jpg")  # Replace with your .jpg file
 background_photo = ImageTk.PhotoImage(background_image)
 
 # Create a Canvas to display the background
-canvas = tk.Canvas(root, width=500, height=400)
+canvas = tk.Canvas(root, width=800, height=400)
 canvas.pack(fill="both", expand=True)
 
 # Place the image on the canvas
