@@ -263,6 +263,7 @@ questions = [
 random.shuffle(questions)
 questions = questions[:10]
 
+label_padding = (20,10)
 
 class PMQuizApp:
     def __init__(self, root):
@@ -305,21 +306,23 @@ class PMQuizApp:
             background="#929acc",
             justify="center",
             anchor="w",
-            wraplength=600
+            wraplength=600,
+            padding=label_padding
         ).pack(pady=(10, 5), padx=20)  # Top=10, Bottom=5, Horizontal=20
 
         # Instructions content
         ttk.Label(
             self.root,
             text=(
-                " - You will answer 10 multiple-choice questions.\n"
-                " - You have 10 seconds to answer each question, once the time is up it will\nautomatically "
-                " - Your score will be displayed at the end."
+                " ⟢ You will answer 10 multiple-choice questions.\n"
+                " ⟢ You have 10 seconds to answer each question; once the time is up, \nit will automatically proceed to the next question.\n "
+                " ⟢ Your score will be displayed at the end."
             ),
             font=("Arial", 13),
             background="#929acc",
             justify="left",
-            wraplength=600
+            wraplength=600,
+            padding=label_padding
         ).pack(pady=(0, 30), padx=20)  # Bottom=30, Horizontal=20
 
         ttk.Label(
@@ -329,7 +332,8 @@ class PMQuizApp:
             background="#929acc",
             justify="center",
             anchor="w",
-            wraplength=600
+            wraplength=600,
+            padding=label_padding
         ).pack(pady=(10, 5), padx=20)  # Top=10, Bottom=5, Horizontal=20
 
         # Buttons for readiness
@@ -367,8 +371,9 @@ class PMQuizApp:
             self.root,
             text="Enter your name to start the quiz:",
             font=("Courier New", 16),
-            background="#b6c1ff",
-            justify="center"
+            background="#dbe0ff",
+            justify="center",
+            padding=label_padding
         ).pack(pady=55)
 
         self.name_entry = ttk.Entry(self.root, width=30, font=("Courier New", 12))
@@ -405,13 +410,14 @@ class PMQuizApp:
             self.root,
             text="",
             font=("Courier New", 14, "bold"),
-            background="#b6c1ff",
-            justify="center"
+            background="#dbe0ff",
+            justify="center",
+            padding=label_padding
         )
         self.question_progress.pack(pady=10)
 
         self.question_label = ttk.Label(
-            self.root, text="", wraplength=450, font=("Courier New", 17), background="#b6c1ff", justify="center"
+            self.root, text="", wraplength=450, font=("Courier New", 17), background="#dbe0ff", justify="center", padding=label_padding
         )
         self.question_label.pack(pady=20)
 
@@ -440,8 +446,9 @@ class PMQuizApp:
             self.root,
             text="",
             font=("Courier New", 12),
-            background="#b6c1ff",
-            justify="center"
+            background="#dbe0ff",
+            justify="center",
+            padding=label_padding
         )
         self.timer_label.pack(pady=10)
 
@@ -503,9 +510,10 @@ class PMQuizApp:
             self.root,
             text=f"Quiz finished! Thank you, {self.user_name}!>_<\n\nYour Score: {self.score}/{len(self.questions)} ({percentage_score:.2f}%)",
             font=("Courier New", 14),
-            background="#b6c1ff",
+            background="#dbe0ff",
             wraplength=550,
-            justify="center"
+            justify="center",
+            padding=label_padding
         ).pack(pady=15)
 
                 # Intelligence comparison based on score
@@ -522,9 +530,10 @@ class PMQuizApp:
             self.root,
             text=comparison_text,
             font=("Courier New", 12, "italic"),
-            background="#b6c1ff",
+            background="#dbe0ff",
             wraplength=550,
-            justify="center"
+            justify="center",
+            padding=label_padding
         ).pack(pady=10)
 
         # Display detailed results
