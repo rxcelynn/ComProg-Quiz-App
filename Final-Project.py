@@ -264,12 +264,12 @@ random.shuffle(questions)
 questions = questions[:10]
 
 
-class QuizApp:
+class PMQuizApp:
     def __init__(self, root):
         self.root = root
         self.root.title("Quest-ion Impossible: Project Management Edition")
-        self.root.geometry("800x700")
-        self.root.config(background="#FFC0CB")
+        self.root.geometry("800x750")
+        self.root.config(background="#b6c1ff")
 
         self.timer_id = None  # Initialize timer_id
         self.reset_quiz()
@@ -284,27 +284,107 @@ class QuizApp:
         self.create_welcome_screen()
 
     def create_welcome_screen(self):
-        """Create the welcome screen."""
+        """Create the welcome screen with instructions and a readiness check."""
+        for widget in self.root.winfo_children():
+            widget.destroy()
+
+        # Welcome message
+        ttk.Label(
+            self.root,
+            text="Welcome to Quest-ion Impossible:\nProject Management Edition!",
+            font=("Courier New", 25, "bold"),
+            background="#b6c1ff",
+            justify="center"
+        ).pack(pady=(40, 20))  # Top=40, Bottom=20
+
+        # "Instructions" Header
+        ttk.Label(
+            self.root,
+            text="Instructions:",
+            font=("Arial", 15, "bold"),
+            background="#929acc",
+            justify="center",
+            anchor="w",
+            wraplength=600
+        ).pack(pady=(10, 5), padx=20)  # Top=10, Bottom=5, Horizontal=20
+
+        # Instructions content
+        ttk.Label(
+            self.root,
+            text=(
+                " - You will answer 10 multiple-choice questions.\n"
+                " - You have 10 seconds to answer each question.\n"
+                " - Your score will be displayed at the end."
+            ),
+            font=("Arial", 13),
+            background="#929acc",
+            justify="left",
+            wraplength=600
+        ).pack(pady=(0, 30), padx=20)  # Bottom=30, Horizontal=20
+
+        ttk.Label(
+            self.root,
+            text="Are you ready to begin?>_<",
+            font=("Arial", 15, "bold"),
+            background="#929acc",
+            justify="center",
+            anchor="w",
+            wraplength=600
+        ).pack(pady=(10, 5), padx=20)  # Top=10, Bottom=5, Horizontal=20
+
+        # Buttons for readiness
+        button_frame = tk.Frame(self.root, background="#b6c1ff")
+        button_frame.pack(pady=20)
+
+        # "Yes" button
+        tk.Button(
+            button_frame,
+            text=" Yes ",
+            command=self.create_name_entry_screen,
+            font=("Arial", 10),
+            bg="#929acc",  # Button background color
+            fg="black"     # Button text color
+        ).grid(row=0, column=0, padx=15)
+
+        # "No" button
+        tk.Button(
+            button_frame,
+            text=" No ",
+            command=self.not_ready_popup,
+            font=("Arial", 10),
+            bg="#929acc",  # Button background color
+            fg="black"     # Button text color
+        ).grid(row=0, column=1, padx=15)
+
+
+
+    def create_name_entry_screen(self):
+        """Create the screen for entering the user's name."""
         for widget in self.root.winfo_children():
             widget.destroy()
 
         ttk.Label(
             self.root,
-            text="Welcome to Quest-ion Impossible:\nProject Management Edition!",
-            font=("Courier New", 20, "bold"),
-            background="#FFC0CB",
+            text="Enter your name to start the quiz:",
+            font=("Courier New", 16),
+            background="#b6c1ff",
             justify="center"
-        ).pack(pady=20)
+        ).pack(pady=55)
 
-        ttk.Label(self.root, text="Enter your name:", font=("Courier New", 12, "bold"), background="#FFC0CB").pack(pady=10)
         self.name_entry = ttk.Entry(self.root, width=30, font=("Courier New", 12))
         self.name_entry.pack(pady=10)
 
         ttk.Button(
             self.root,
-            text="Start",
+            text="Start Quiz",
             command=self.start_quiz
         ).pack(pady=20)
+
+    def not_ready_popup(self):
+        """Display a popup when the user is not ready."""
+        if messagebox.showinfo("See You Next Time!", "Okay, see you next time when you're ready!"):
+            self.root.quit()
+
 
     def start_quiz(self):
         """Start the quiz if the user's name is valid."""
@@ -316,6 +396,8 @@ class QuizApp:
 
     def load_question_screen(self):
         """Load the question screen."""
+        if self.timer_id:
+            self.root.after_cancel(self.timer_id)
         for widget in self.root.winfo_children():
             widget.destroy()
 
@@ -323,25 +405,30 @@ class QuizApp:
             self.root,
             text="",
             font=("Courier New", 14, "bold"),
-            background="#FFC0CB",
+            background="#b6c1ff",
             justify="center"
         )
         self.question_progress.pack(pady=10)
 
         self.question_label = ttk.Label(
-            self.root, text="", wraplength=450, font=("Courier New", 17), background="#FFC0CB", justify="center"
+            self.root, text="", wraplength=450, font=("Courier New", 17), background="#b6c1ff", justify="center"
         )
         self.question_label.pack(pady=20)
 
-        self.button_frame = tk.Frame(self.root)
+        self.button_frame = tk.Frame(self.root, background="#b6c1ff")
         self.button_frame.pack(pady=15)
 
         self.answer_buttons = []
         for i in range(4):
-            button = ttk.Button(
+            button = tk.Button(
                 self.button_frame,
                 text="",
-                command=lambda i=i: self.check_answer(i)
+                command=lambda i=i: self.check_answer(i),
+                font=("Arial", 11),
+                bg="#ccd4ff",  # Set the button background color
+                fg="black",    # Set the button text color
+                activebackground="white",  # Set the active button background color
+                activeforeground="#5b6180"  # Set the active button text color
             )
             button.grid(row=i // 2, column=i % 2, padx=20, pady=20, sticky="ew")
             self.answer_buttons.append(button)
@@ -353,24 +440,29 @@ class QuizApp:
             self.root,
             text="",
             font=("Courier New", 12),
-            background="#FFC0CB",
+            background="#b6c1ff",
             justify="center"
         )
         self.timer_label.pack(pady=10)
 
         self.load_question()
 
-    def start_timer(self, countdown=15):
+    def start_timer(self, countdown=10):
         """Start a countdown timer."""
         if countdown > 0:
-            self.timer_label.config(text=f"Time Left: {countdown} seconds")
-            self.timer_id = self.root.after(1000, self.start_timer, countdown - 1)
+            if self.timer_label.winfo_exists():  # Check if the label still exists
+                self.timer_label.config(text=f"Time Left: {countdown} seconds")
+                self.timer_id = self.root.after(1000, self.start_timer, countdown - 1)
         else:
-            self.timer_label.config(text="Time's up!")
-            self.root.after_cancel(self.timer_id)
+            if self.timer_label.winfo_exists():
+                self.timer_label.config(text="Time's up!")
+            # Handle when time runs out
+            if self.current_question < len(self.questions):
+                question_data = self.questions[self.current_question]
+                self.user_answers.append((question_data["question"], "No Answer", question_data["answer"]))
             self.current_question += 1
             self.load_question()
-
+            
     def load_question(self):
         """Load a question and its choices."""
         if self.current_question < len(self.questions):
@@ -388,7 +480,7 @@ class QuizApp:
                 self.answer_buttons[i].config(text=choice)
             self.start_timer()
         else:
-            self.show_results_button()
+            self.show_results()
 
     def check_answer(self, index):
         """Check the user's answer."""
@@ -402,52 +494,6 @@ class QuizApp:
         self.current_question += 1
         self.load_question()
 
-    def show_results_button(self):
-        """Show the results button."""
-        self.question_label.config(text="Quiz Finished! Click the button below to see your results.")
-        for button in self.answer_buttons:
-            button.destroy()
-
-        ttk.Button(
-            self.root,
-            text="See Results",
-            command=self.show_results
-        ).pack(pady=20)
-
-    def show_results(self):
-        """Display the final quiz results, quiz recap"""
-        for widget in self.root.winfo_children():
-            widget.destroy()
-
-        percentage_score = (self.score / len(self.questions)) * 100
-        ttk.Label(
-            self.root,
-            text=f"Thank you, {self.user_name}!\n\nYour Score: {self.score}/{len(self.questions)} ({percentage_score:.2f}%)",
-            font=("Courier New", 14),
-            background="#FFC0CB",
-            wraplength=550,
-            justify="center"
-        ).pack(pady=20)
-
-        # Intelligence comparison
-        if self.score == len(self.questions):
-            comparison_text = "Congratulations! You got a perfect score!\nYou're as intelligent as Albert Einstein!"
-        elif self.score >= len(self.questions) * 0.8:
-            comparison_text = "Great job! You're a Project Management expert!"
-        elif self.score >= len(self.questions) * 0.5:
-            comparison_text = "Not bad! You have a solid understanding of Project Management."
-        else:
-            comparison_text = "Keep learning! You're on the right path to mastering Project Management."
-
-        ttk.Label(
-            self.root,
-            text=comparison_text,
-            font=("Courier New", 12, "bold italic"),
-            background="#FFC0CB",
-            wraplength=550,
-            justify="center"
-        ).pack(pady=5)
-
     def show_results(self):
         for widget in self.root.winfo_children():
             widget.destroy()
@@ -455,12 +501,12 @@ class QuizApp:
         percentage_score = (self.score / len(self.questions)) * 100
         ttk.Label(
             self.root,
-            text=f"Thank you, {self.user_name}!\n\nYour Score: {self.score}/{len(self.questions)} ({percentage_score:.2f}%)",
+            text=f"Quiz finished! Thank you, {self.user_name}!>_<\n\nYour Score: {self.score}/{len(self.questions)} ({percentage_score:.2f}%)",
             font=("Courier New", 14),
-            background="#FFC0CB",
+            background="#b6c1ff",
             wraplength=550,
             justify="center"
-        ).pack(pady=20)
+        ).pack(pady=15)
 
                 # Intelligence comparison based on score
         if self.score == len(self.questions):
@@ -476,10 +522,10 @@ class QuizApp:
             self.root,
             text=comparison_text,
             font=("Courier New", 12, "italic"),
-            background="#FFC0CB",
+            background="#b6c1ff",
             wraplength=550,
             justify="center"
-        ).pack(pady=20)
+        ).pack(pady=10)
 
         # Display detailed results
         result_frame = tk.Frame(self.root)
@@ -497,20 +543,20 @@ class QuizApp:
         canvas.create_window((0, 0), window=scrollable_frame, anchor="nw")
         canvas.configure(yscrollcommand=scrollbar.set)
 
-        canvas.pack(side="left", fill="both", expand=True)
+        canvas.pack(side="justify", fill="both", expand=True)
         scrollbar.pack(side="right", fill="y")
 
         for i, (question, user_answer, correct_answer) in enumerate(self.user_answers):
             ttk.Label(scrollable_frame, text=f"Q{i + 1}: {question}", font=("Arial", 12, "bold"),
-                      background="#FFC0CB", wraplength=500).pack(anchor="w", pady=5)
-            ttk.Label(scrollable_frame, text=f"Your Answer: {user_answer}", font=("Arial", 12), background="pink",
-                      wraplength=500).pack(anchor="w")
+                      background="#ccd4ff", wraplength=500).pack(anchor="w", pady=5)
+            ttk.Label(scrollable_frame, text=f"Your Answer: {user_answer}", font=("Arial", 12), background="#ccd4ff",
+                      wraplength=400).pack(anchor="w")
             ttk.Label(
                 scrollable_frame,
                 text=f"Correct Answer: {correct_answer}",
-                font=("Arial", 12),
-                background="#FFC0CB",
-                wraplength=500,
+                font=("Arial", 11),
+                background="#ccd4ff",
+                wraplength=400,
                 foreground="green" if user_answer == correct_answer else "red"
             ).pack(anchor="w", pady=(0, 10))
 
@@ -518,10 +564,10 @@ class QuizApp:
             self.root,
             text="Restart Quiz",
             command=self.reset_quiz
-        ).pack(pady=20)
+        ).pack(pady=10)
         
 # Main Application
 if __name__ == "__main__":
     root = tk.Tk()
-    app = QuizApp(root)
+    app = PMQuizApp(root)
     root.mainloop()
