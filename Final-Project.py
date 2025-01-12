@@ -75,7 +75,7 @@ questions = [
     {
         "question": "What type of report do project teams create to reflect on what went right and what went wrong with the project?",
         "choices": ["Business Case", "Progress Report", "Lessons-Learned Report", "Final Project Report"],
-        "answer": "Lesson-Learned Report"
+        "answer": "Lessons-Learned Report"
     },
     {
         "question": "Which of the following outputs is often completed before initiating a project?",
@@ -221,42 +221,42 @@ questions = [
     {
         "question": "What is a critical path in project management?",
         "choices": [
-            "The shortest path through the project schedule",
-            "The longest sequence of activities determining project duration",
-            "A list of critical risks for the project",
-            "The sequence of activities requiring the least resources"
+            "The shortest path through \nthe project schedule",
+            "The longest sequence of \nactivities determining project duration",
+            "A list of critical \nrisks for the project",
+            "The sequence of activities \nrequiring the least resources"
         ],
-        "answer": " The longest sequence of activities determining project duration"
+        "answer": " The longest sequence of \nactivities determining project duration"
     },
     {
         "question": "What is scope creep?",
         "choices": [
-            "The process of reducing project scope to meet constraints",
-            "Uncontrolled changes or growth in a project’s scope",
-            "The process of clarifying project deliverables",
-            "Reviewing project objectives to align with stakeholder goals"
+            "The process of reducing \nproject scope to meet constraints",
+            "Uncontrolled changes or \ngrowth in a project’s scope",
+            "The process of clarifying\n project deliverables",
+            "Reviewing project objectives\n to align with stakeholder goals"
         ],
-        "answer": "Uncontrolled changes or growth in a project’s scope"
+        "answer": "Uncontrolled changes or \ngrowth in a project’s scope"
     },
     {
         "question": "What is the purpose of a risk register?",
         "choices": [
             "To track the project’s schedule",
-            "To record and monitor identified risks and their mitigation plans",
+            "To record and monitor identified risks and their \nmitigation plans",
             "To assign resources to project activities",
             "To track project costs and expenditures"
         ],
-        "answer":  "A document that outlines the project's objectives, deliverables, and boundaries"
+        "answer":  "To record and monitor identified risks and their \nmitigation plans"
     },
     {
         "question": "What is a project scope statement?",
         "choices": [
-            "A document that outlines the project's objectives, deliverables, and boundaries",
+            "A document that outlines the project's\nobjectives, deliverables, and boundaries",
             "A list of project task",
             "A document that formally authorizes a project",
             "A plan for project completion"
         ],
-        "answer": "A document that outlines the project's objectives, deliverables, and boundaries"
+        "answer": "A document that outlines the project's \nobjectives, deliverables, and boundaries"
     },
 ]
 
@@ -268,7 +268,7 @@ class PMQuizApp:
     def __init__(self, root):
         self.root = root
         self.root.title("Quest-ion Impossible: Project Management Edition")
-        self.root.geometry("800x750")
+        self.root.geometry("800x600")
         self.root.config(background="#b6c1ff")
 
         self.timer_id = None  # Initialize timer_id
@@ -313,7 +313,7 @@ class PMQuizApp:
             self.root,
             text=(
                 " - You will answer 10 multiple-choice questions.\n"
-                " - You have 10 seconds to answer each question.\n"
+                " - You have 10 seconds to answer each question, once the time is up it will\nautomatically "
                 " - Your score will be displayed at the end."
             ),
             font=("Arial", 13),
@@ -528,8 +528,8 @@ class PMQuizApp:
         ).pack(pady=10)
 
         # Display detailed results
-        result_frame = tk.Frame(self.root)
-        result_frame.pack(fill="both", expand=True, padx=10, pady=10)
+        result_frame = tk.Frame(self.root, height=700, width=600)  # Limit the frame size
+        result_frame.pack(fill="x", padx=10, pady=10)
 
         canvas = tk.Canvas(result_frame)
         scrollbar = ttk.Scrollbar(result_frame, orient="vertical", command=canvas.yview)
@@ -543,28 +543,41 @@ class PMQuizApp:
         canvas.create_window((0, 0), window=scrollable_frame, anchor="nw")
         canvas.configure(yscrollcommand=scrollbar.set)
 
-        canvas.pack(side="justify", fill="both", expand=True)
+        canvas.pack(side="left", fill="both", expand=True)  
         scrollbar.pack(side="right", fill="y")
 
+        # Populate scrollable frame
         for i, (question, user_answer, correct_answer) in enumerate(self.user_answers):
-            ttk.Label(scrollable_frame, text=f"Q{i + 1}: {question}", font=("Arial", 12, "bold"),
-                      background="#ccd4ff", wraplength=500).pack(anchor="w", pady=5)
-            ttk.Label(scrollable_frame, text=f"Your Answer: {user_answer}", font=("Arial", 12), background="#ccd4ff",
-                      wraplength=400).pack(anchor="w")
+            ttk.Label(
+                scrollable_frame,
+                text=f"Q{i + 1}: {question}",
+                font=("Arial", 12, "bold"),
+                background="#ccd4ff",
+                wraplength=500
+            ).pack(anchor="w", pady=5)
+            ttk.Label(
+                scrollable_frame,
+                text=f"Your Answer: {user_answer}",
+                font=("Arial", 12),
+                background="#ccd4ff",
+                wraplength=500
+            ).pack(anchor="w")
             ttk.Label(
                 scrollable_frame,
                 text=f"Correct Answer: {correct_answer}",
-                font=("Arial", 11),
+                font=("Arial", 12),
                 background="#ccd4ff",
-                wraplength=400,
+                wraplength=500,
                 foreground="green" if user_answer == correct_answer else "red"
             ).pack(anchor="w", pady=(0, 10))
 
+        # Restart Quiz Button
         ttk.Button(
             self.root,
             text="Restart Quiz",
             command=self.reset_quiz
-        ).pack(pady=10)
+        ).pack(pady=20)
+
         
 # Main Application
 if __name__ == "__main__":
