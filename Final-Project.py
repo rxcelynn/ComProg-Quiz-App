@@ -256,7 +256,7 @@ questions = [
             "A document that formally authorizes a project",
             "A plan for project completion"
         ],
-        "answer": "A document that outlines the project's \nobjectives, deliverables, and boundaries"
+        "answer": "A document that outlines the project's\nobjectives, deliverables, and boundaries"
     },
 ]
 
@@ -315,7 +315,7 @@ class PMQuizApp:
             self.root,
             text=(
                 " ⟢ You will answer 10 multiple-choice questions.\n"
-                " ⟢ You have 10 seconds to answer each question; once the time is up, \nit will automatically proceed to the next question.\n "
+                " ⟢ You have 15 seconds to answer each question; once the time is up, \nit will automatically proceed to the next question.\n "
                 " ⟢ Your score will be displayed at the end."
             ),
             font=("Arial", 13),
@@ -454,7 +454,7 @@ class PMQuizApp:
 
         self.load_question()
 
-    def start_timer(self, countdown=10):
+    def start_timer(self, countdown=15):
         """Start a countdown timer."""
         if countdown > 0:
             if self.timer_label.winfo_exists():  # Check if the label still exists
@@ -489,7 +489,7 @@ class PMQuizApp:
         else:
             self.show_results()
 
-    def check_answer(self, index):
+    def check_answer(self, index): 
         """Check the user's answer."""
         question_data = self.questions[self.current_question]
         selected_answer = self.answer_buttons[index].cget("text")
@@ -501,7 +501,7 @@ class PMQuizApp:
         self.current_question += 1
         self.load_question()
 
-    def show_results(self):
+    def show_results(self): #results
         for widget in self.root.winfo_children():
             widget.destroy()
 
